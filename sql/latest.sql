@@ -1,6 +1,6 @@
 #
 # TABLE STRUCTURE FOR: admin_groups
-#
+#jdbc:mysql://host::localhost?[:port::3306][/ci3-carwale?][\?<&,user=root,password=>]#
 
 DROP TABLE IF EXISTS `admin_groups`;
 
