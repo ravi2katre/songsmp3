@@ -10,4 +10,8 @@ class Home extends MY_Controller {
 	{
 		$this->render('home', 'full_width');
 	}
+
+	public function test(){
+        $this->render('home', '3_column');
+    }
 }

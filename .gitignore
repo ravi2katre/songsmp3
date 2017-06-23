@@ -1,4 +1,5 @@
 .DS_Store
+.idea
 
 ### Bower ###
 bower_components/
@@ -18,6 +19,7 @@ application/composer.lock
 */logs/log-*.php
 */logs/!index.html
 */cache/*
+*/uploads/*
 */cache/!index.html
 */cache/!.htaccess
 
@@ -27,3 +29,12 @@ application/composer.lock
 ### SQL backup files ###
 sql/backup/*
 sql/backup/!index.html
+.idea/ci_bootstrap_3.iml
+.idea/dataSources.local.xml
+.idea/dataSources/
+.idea/deployment.xml
+.idea/modules.xml
+.idea/sqldialects.xml
+.idea/workspace.xml
+application/cache/
+sql/backup/

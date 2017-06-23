@@ -1,3 +1,4 @@
+
 <?php $this->load->view('_partials/navbar'); ?>
 
 <div class="container">
