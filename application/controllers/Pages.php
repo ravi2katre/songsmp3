@@ -5,80 +5,136 @@ defined('BASEPATH') OR exit('No direct script access allowed');
  * Home page
  */
 class Pages extends MY_Controller {
-    var $static_page_layout ='';
+    var $controller_page_layout ='';
 	public function __construct()
 	{
 		parent::__construct();
-        $this->static_page_layout ='default';
+
+        $this->controller_page_layout ='3_column';
+
+
 	}
 
 	public function index()
 	{
-		$this->render('home', $this->static_page_layout);
+	   //print_r($this->input->get_post());
+        //$this->output->cache(1);
+	    //$this->mViewData['list'] = $this->File_model->get_files();
+        //cidb($this->db); exit;
+	    //cidb($this->mViewData['list']);
+		$this->render('pages/home', $this->controller_page_layout);
 	}
-	public function about_us()
-	{
-		$this->render('pages/about_us', $this->static_page_layout);
-	}
 
-    public function vision_and_mission()
-    {
-        $this->render('pages/vision_and_mission', $this->static_page_layout);
+	public function category($id,$slug,$offset = 1){
+        $limit = 20;
+        $this->mPageTitle = $this->mViewData['mPageTitle'] = $slug;
+            //get query string
+        $this->_load_session('category');
+        $query_array = array();
+        if ($this->input->post()) {
+            foreach ($this->input->post() as $key => $val) {
+                $query_array[$key] = $val;
+            }
+        }
+
+
+	    //echo "ggggg";exit;
+        //$this->output->cache(1);
+        $condition = "c.parentid = ".$id;
+        $this->mViewData['list'] = $this->File_model->left_categories($condition,$limit, ($offset * $limit) - $limit);
+
+
+        if($this->mViewData['list']['num_rows']==0){
+            $condition = "f.cid = ".$id;
+            $this->mViewData['list'] = $this->File_model->get_files($condition,$limit, ($offset * $limit) - $limit);
+
+
+            //pagination
+            $this->load->library('pagination');
+            $config = array();
+            $config['base_url'] = site_url('category/'.$id."/".$slug);
+            $config['page_query_string'] = FALSE;
+            $config['use_page_numbers'] = TRUE;
+            $config['total_rows'] = $this->mViewData['list']['num_rows'];
+            $config['per_page'] = $limit;
+            $config['uri_segment'] = 4;
+            $this->pagination->initialize($config);
+            $this->mViewData['pagination'] = $this->pagination->create_links();
+
+            $this->render('pages/files', $this->controller_page_layout);
+        }else{
+
+            //pagination
+            $this->load->library('pagination');
+            $config = array();
+            $config['base_url'] = site_url('category/'.$id."/".$slug);
+            $config['page_query_string'] = FALSE;
+            $config['use_page_numbers'] = TRUE;
+            $config['total_rows'] = $this->mViewData['list']['num_rows'];
+            $config['per_page'] = $limit;
+            $config['uri_segment'] = 4;
+            $this->pagination->initialize($config);
+            $this->mViewData['pagination'] = $this->pagination->create_links();
+
+            $this->render('pages/category', $this->controller_page_layout);
+        }
+        //cidb($this->db); exit;
+        //cidb($this->mViewData['list']);exit;
+       // $this->mViewData['list'] = $this->File_model->get_files();
+
     }
 
-    public function aim_and_objective()
-    {
-        $this->render('pages/aim_and_objective', $this->static_page_layout);
+    public function files($file_id,$slug){
+        //echo "ggggg";exit;
+        //$this->output->cache(1);
+        //$condition = "f.id = ".$file_id;
+        //$this->mViewData['list'] = $this->File_model->left_categories($condition);
+        //cidb($this->db); exit;
+
+        $this->mViewData['list'] = $this->File_model->find($file_id);
+        $this->mPageTitle = $this->mViewData['mPageTitle'] = $slug;
+
+        //cidb($this->mViewData['list']);exit;
+        $this->render('pages/file_show', $this->controller_page_layout);
     }
 
-    public function about_bhagirathi()
-    {
-        $this->render('pages/about_bhagirathi', $this->static_page_layout);
+    /**
+     *
+     */
+    function search($report) {
+        $query_array = array();
+        if ($this->input->post()) {
+            foreach ($this->input->post() as $key => $val) {
+                $query_array[$key] = $val;
+            }
+        }
+        //$query_array['start_date']= (empty($this->input->post('start_date')))?date("2000/m/d H:i:s"):$this->input->post('start_date');
+        //$query_array['end_date'] = (empty($this->input->post('end_date')))?date("Y/m/d H:i:s"):$this->input->post('end_date');
+
+        $this->_save_session($query_array);
+
+
+        redirect("admin/customers/" . $report . "/search/");
     }
 
-    public function local_managing_committee()
-    {
-        $this->render('pages/local_managing_committee', $this->static_page_layout);
+    /**
+     * @param $query_array
+     */
+    function _save_session($query_array) {
+        $this->session->set_userdata('search', http_build_query($query_array));
     }
 
-    public function training_and_placement()
-    {
-        $this->render('pages/training_and_placement', $this->static_page_layout);
-    }
+    /**
+     * @param $search_query
+     */
+    function _load_session($search_query) {
+        if (!is_null($search_query) && $search_query == 'search') {
 
-    public function centralized_training_and_placement_cell()
-    {
-        $this->render('pages/centralized_training_and_placement_cell', $this->static_page_layout);
-    }
+            $search = $this->session->userdata('search');
 
-    public function addmission_criteria()
-    {
-        $this->render('pages/addmission_criteria', $this->static_page_layout);
+            if (isset($search)) {
+                parse_str($search, $_POST);
+            }
+        }
     }
-
-    public function facilities()
-    {
-        $this->render('pages/facilities', $this->static_page_layout);
-    }
-
-    public function library()
-    {
-        $this->render('pages/library', $this->static_page_layout);
-    }
-
-    public function computer_lab()
-    {
-        $this->render('pages/computer_lab', $this->static_page_layout);
-    }
-
-    public function photo_gallery()
-    {
-        $this->render('pages/photo_gallery', $this->static_page_layout);
-    }
-
-    public function contact_us()
-    {
-        $this->render('pages/contact_us', $this->static_page_layout);
-    }
-
 }
