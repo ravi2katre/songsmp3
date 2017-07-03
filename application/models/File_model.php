@@ -99,30 +99,36 @@ class File_model extends MY_Model {
 
 
     public function get_files($condition='', $limit=500, $offset=0, $sort_by = '', $sort_order = 'desc') {
-        //$this->db->cache_delete();
+        $this->db->cache_delete();
         $this->db->cache_on();
-       // $this->db->cache_off();
+
         $condition = rtrim($condition,' AND');
         $condition = (!empty($condition))?' WHERE '.$condition:' where 1 ';
 
         $sql = "SELECT 
 		SQL_CALC_FOUND_ROWS
-		  f.*
-          FROM file f         
+		  f.*,
+		  c.name as cat_name,
+		  c.folder,
+		  c.thumb
+          FROM file f 
+                  left JOIN category c ON c.id=f.cid
         {$condition} order by f.id desc
         ";
         $limit = " limit ".$offset.",".$limit;
         $sql = $sql.$limit;
         $ret['rows'] = $this->db->query($sql)->result_array();
+
         //echo $this->db->last_query();
         $result = $this->db->query("SELECT FOUND_ROWS() as totalItems")->row_array();
+        $this->db->cache_off();
         $ret['num_rows'] = $result['totalItems'];
         return $ret;
 
     }
 
     public function get_categories($condition = '', $limit=500, $offset=0, $sort_by = '', $sort_order = 'desc') {
-        //$this->db->cache_delete();
+        $this->db->cache_delete();
         $this->db->cache_on();
         $condition = rtrim($condition,' AND');
         $condition = (!empty($condition))?' WHERE '.$condition:' where 1 ';
@@ -136,9 +142,11 @@ class File_model extends MY_Model {
         $limit = " limit ".$offset.",".$limit;
         $sql = $sql.$limit;
         $ret['rows'] = $this->db->query($sql)->result_array();
+
         //echo $this->db->last_query();
         $result = $this->db->query("SELECT FOUND_ROWS() as totalItems")->row_array();
         $ret['num_rows'] = $result['totalItems'];
+        $this->db->cache_off();
         return $ret;
 
     }

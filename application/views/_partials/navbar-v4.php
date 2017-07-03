@@ -3,7 +3,7 @@
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
-        <a class="navbar-brand" href="#"><?php echo $site_name; ?></a>
+        <a class="navbar-brand " href="#"><h1><?php echo $site_name; ?></h1></a>
         <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
 
             <?php foreach ($menu as $parent => $parent_params): ?>

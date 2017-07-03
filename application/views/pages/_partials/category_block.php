@@ -1,6 +1,6 @@
 
 
-<div class="card">
+<div class="card text-center">
 
         <a href="category/<?php echo $id; ?>/<?php echo create_slug($name); ?>" >
 

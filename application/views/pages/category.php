@@ -1,6 +1,6 @@
 
 <div class="card">
-    <h3 class="card-header"><?php echo $mPageTitle; ?></h3>
+    <h3 class="card-header title_bar"><?php echo $mPageTitle; ?></h3>
     <div class="card-block">
 
         <div class="card-group">

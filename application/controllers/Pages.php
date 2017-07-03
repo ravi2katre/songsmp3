@@ -27,7 +27,7 @@ class Pages extends MY_Controller {
 
 	public function category($id,$slug,$offset = 1){
         $limit = 20;
-        $this->mPageTitle = $this->mViewData['mPageTitle'] = $slug;
+        $this->mPageTitle = $this->mViewData['mPageTitle'] = str_replace("-", " ", $slug);
             //get query string
         $this->_load_session('category');
         $query_array = array();
@@ -41,10 +41,11 @@ class Pages extends MY_Controller {
 	    //echo "ggggg";exit;
         //$this->output->cache(1);
         $condition = "c.parentid = ".$id;
-        $this->mViewData['list'] = $this->File_model->left_categories($condition,$limit, ($offset * $limit) - $limit);
-
+        $this->mViewData['list'] = $this->File_model->get_categories($condition,$limit, ($offset * $limit) - $limit);
+        //print_r($this->mViewData['list']);exit;
 
         if($this->mViewData['list']['num_rows']==0){
+            //$this->mViewData['cat_detail'] = $this->mViewData['list']['rows'][0];
             $condition = "f.cid = ".$id;
             $this->mViewData['list'] = $this->File_model->get_files($condition,$limit, ($offset * $limit) - $limit);
 
@@ -91,8 +92,9 @@ class Pages extends MY_Controller {
         //$this->mViewData['list'] = $this->File_model->left_categories($condition);
         //cidb($this->db); exit;
 
-        $this->mViewData['list'] = $this->File_model->find($file_id);
-        $this->mPageTitle = $this->mViewData['mPageTitle'] = $slug;
+        $this->mViewData['list'] = $this->File_model->get_files('f.id='.$file_id);
+        $this->mViewData['list'] = $this->mViewData['list']['rows'][0];
+        $this->mPageTitle = $this->mViewData['mPageTitle'] = str_replace("-", " ", $slug);
 
         //cidb($this->mViewData['list']);exit;
         $this->render('pages/file_show', $this->controller_page_layout);
@@ -136,5 +138,36 @@ class Pages extends MY_Controller {
                 parse_str($search, $_POST);
             }
         }
+    }
+
+    public function download() {
+        $this->load->helper('download');
+        $id = unserialize_data($this->input->post('download_key'));
+        $condition = "f.id=".$id;
+        $result = $this->File_model->get_files($condition);
+        $list= $result['rows'][0];
+//cidb($result);exit;
+        $fileName= $list['name'].".".$list['ext'];
+        if ($fileName) {
+            $file = download_url ( $list['folder'])  . $fileName;
+            // check file exists
+            if (file_exists ( $file )) {
+
+                // get file content
+                $data = file_get_contents ( $file );
+
+                //force download
+                force_download ( $fileName, $data );
+            } else {
+                echo "ffffff";exit;
+                // Redirect to base url
+                redirect ( base_url () );
+            }
+        }
+    }
+
+
+    function search_files(){
+
     }
 }

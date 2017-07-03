@@ -1,12 +1,7 @@
-<div class="card">
-    <h3 class="card-header"><i class="fa fa-folder-open" ></i>  <?php echo $mPageTitle; ?></h3>
-    <div class="card-block">
-
-    </div>
-</div>
+<?php  $this->load->view('pages/_partials/cat_detail_box', $list); ?>
 <br>
 <div class="card">
-    <div class="card-header">
+    <div class="card-header title_bar">
         Songs
     </div>
     <div class="card-block">

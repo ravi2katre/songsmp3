@@ -2,7 +2,7 @@
 
 <?php //cidb($sidebar_menu);?>
 <div class="card" >
-    <h3 class="card-header">Main Categories</h3>
+    <h3 class="card-header title_bar">Main Categories</h3>
     <div class="card-block">
         <ul class="list-group list-group-flush">
             <?php
