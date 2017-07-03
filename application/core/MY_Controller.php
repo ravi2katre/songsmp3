@@ -62,7 +62,7 @@ class MY_Controller extends MX_Controller {
 	private function _setup()
 	{
 		$config = $this->config->item('ci_bootstrap');
-		
+
 		// load default values
 		$this->mBaseUrl = empty($this->mModule) ? base_url() : base_url($this->mModule).'/';
 		$this->mSiteName = empty($config['site_name']) ? '' : $config['site_name'];
@@ -131,7 +131,7 @@ class MY_Controller extends MX_Controller {
 				$this->mUserMainGroup = $this->mUserGroups[0]->name;	
 			}
 		}
-
+        $this->mViewData['sidebar_menu'] = $this->get_sidebar_cat();
 		$this->mConfig = $config;
 	}
 
@@ -273,6 +273,12 @@ class MY_Controller extends MX_Controller {
 		else
 			array_unshift($this->mBreadcrumb, $entry);
 	}
+
+    protected function get_sidebar_cat(){
+
+        $condition = "c.parentid = 0";
+        return $this->File_model->left_categories($condition);
+    }
 }
 
 // include base controllers

@@ -16,6 +16,11 @@ function upload_url($path)
 	return base_url('assets/uploads/'.$path);
 }
 
+// location of uploaded files
+function download_url($path)
+{
+    return FCPATH .'/'.$path;
+}
 // location of post-processed assets (e.g. combined CSS / JS files)
 function dist_url($path)
 {
