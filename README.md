@@ -44,7 +44,7 @@ This repository contains setup for rapid development:
 
 ### Demo Project
 
-A demo repository can be found from: https://github.com/waifung0207/ci_bootstrap_3_demo
+A demo repository can be found from: http://songs.ravikatre.in
 
 
 ### Server Environment
@@ -155,17 +155,6 @@ The gulpfile.js folder is prepared with following tasks available:
 * **watch**: monitor JS / CSS / image files and execute specific tasks upon changes
 
 
-### Screenshots
-
-Frontend - Home: 
-
-![](screenshots/frontend_home.png "Frontend Home")
-
-Admin Panel - Home: 
-
-![](screenshots/admin_home.png "Admin Panel Home")
-
-More screenshots can be viewed from the [screenshots folder](https://github.com/waifung0207/ci_bootstrap_3/blob/master/screenshots/) under this repository.
 
 
 ### TODO
