@@ -64,10 +64,16 @@ $config['ci_bootstrap'] = array(
 			'url'		=> '',
 			'icon'		=> 'fa fa-home',
 		),
-        'category' => array(
-            'name'		=> 'Category',
-            'url'		=> 'setting/category',
-            'icon'		=> 'fa fa-cogs',
+        'files' => array(
+            'name'		=> 'Data Management',
+            'url'		=> 'files',
+            'icon'		=> 'fa fa-circle-o',
+            'children'  => array(
+                'Pages'			=> 'files/pages',
+                'Categories'		=> 'files/category',
+                'Files'	=> 'files/file',
+                'Tags'	=> 'files/tags',
+            )
         ),
 
 		'user' => array(

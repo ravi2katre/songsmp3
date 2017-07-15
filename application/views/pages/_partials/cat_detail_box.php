@@ -15,59 +15,16 @@ $name = (isset($cat_name))?$cat_name:$mPageTitle;
                 }
                 ?>            </div>
             <div class="movie_details">
-                <table style="font-family: arial;">
-                    <tbody>
-                    <tr>
-                        <td class="m_d_title" valign="top">
-                            Staring
-                        </td>
-                        <td class="m_d_title2" valign="top">
-                            :
-                        </td>
-                        <td class="m_d_title3">
-                            <a href="/stars/salman-khan.html">Salman Khan</a>, &nbsp;<a href="/stars/sohail-khan.html">Sohail Khan</a>, &nbsp;<a href="/stars/zhu-zhu.html">Zhu Zhu</a>				</td>
-                    </tr>
-                    <tr>
-                        <td class="m_d_title" valign="top">
-                            Director
-                        </td>
-                        <td class="m_d_title2" valign="top">
-                            :
-                        </td>
-                        <td class="m_d_title3">
-                            <a href="/directors/kabir-khan.html">Kabir Khan</a>				</td>
-                    </tr>
-                    <tr>
-                        <td class="m_d_title" valign="top">
-                            Music Director(s)
-                        </td>
-                        <td class="m_d_title2" valign="top">
-                            :
-                        </td>
-                        <td class="m_d_title3">
-                            <a href="/music-directors/pritam.html">Pritam</a>				</td>
-                    </tr>
-                    <tr>
-                        <td class="m_d_title" valign="top">
-                            Composer(s)
-                        </td>
-                        <td class="m_d_title2" valign="top">
-                            :
-                        </td>
-                        <td class="m_d_title3">
-                            <a href="/composers/manurishi-chadha.html">Manurishi Chadha</a>				</td>
-                    </tr>
-                    <tr>
-                        <td class="m_d_title" valign="top">
-                            Singer(s)
-                        </td>
-                        <td class="m_d_title2" valign="top">
-                            :
-                        </td>
-                        <td class="m_d_title3">
-                            <a href="/singers/kamaal-khan.html">Kamaal Khan</a>, &nbsp;<a href="/singers/amit-mishra.html">Amit Mishra</a>, &nbsp;<a href="/singers/akashdeep-sengupta.html">Akashdeep Sengupta</a>, &nbsp;<a href="/singers/pritam.html">Pritam</a>, &nbsp;<a href="/singers/rahat-fateh-ali-khan.html">Rahat Fateh Ali Khan</a>, &nbsp;<a href="/singers/jubin-nautiyal.html">Jubin Nautiyal</a>				</td>
-                    </tr>
-                    </tbody></table>
+                <ul>
+                    <?php
+                    if(isset($tags['rows']) && count($tags['rows']) > 0){
+                        foreach($tags['rows'] as $key=>$val){
+                            cidb($val);
+                        }
+                    }
+
+                    ?>
+                </ul>
             </div>
         </div>
     </div>

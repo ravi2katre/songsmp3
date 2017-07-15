@@ -25,6 +25,19 @@ class Pages extends MY_Controller {
 		$this->render('pages/home', $this->controller_page_layout);
 	}
 
+
+	public function page($slug){
+	    $this->load->model('Pages_model');
+        $this->mViewData['slug'] = $slug;
+        $condition = array(
+            'slug' =>$this->mViewData['slug']
+        );
+        $this->mViewData['page_row'] = $page_rows  = $this->Pages_model->search($condition);
+        //cidb($this->mViewData);exit;
+        $this->mPageTitle = $this->mViewData['page_row'][0]->name;
+        $this->render('pages/page', $this->controller_page_layout);
+    }
+
 	public function category($id,$slug,$offset = 1){
         $limit = 20;
         $this->mPageTitle = $this->mViewData['mPageTitle'] = str_replace("-", " ", $slug);
@@ -45,6 +58,13 @@ class Pages extends MY_Controller {
         //print_r($this->mViewData['list']);exit;
 
         if($this->mViewData['list']['num_rows']==0){
+            /*---------------- Get Tags ---------------*/
+            $this->load->model('Pages_model');
+            $condition = " catp.cat_id =  {$id} " ;
+            $this->mViewData['tags'] = $this->Pages_model->get_category_tags($condition);
+            //cidb($this->mViewData['tags'] );
+            /*---------------- Tags ends ---------------*/
+
             //$this->mViewData['cat_detail'] = $this->mViewData['list']['rows'][0];
             $condition = "f.cid = ".$id;
             $this->mViewData['list'] = $this->File_model->get_files($condition,$limit, ($offset * $limit) - $limit);
