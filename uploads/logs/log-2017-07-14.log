@@ -1,2 +1,0 @@
-ERROR - 2017-07-14 05:51:41 --> Severity: Notice --> Undefined variable: tags E:\wamp64\www\RAVI\songsmp3\application\views\pages\_partials\cat_detail_box.php 20
-ERROR - 2017-07-14 05:51:41 --> Severity: Warning --> Invalid argument supplied for foreach() E:\wamp64\www\RAVI\songsmp3\application\views\pages\_partials\cat_detail_box.php 20

@@ -26,6 +26,7 @@ class Admin_Controller extends MY_Controller {
 	// Render template (override parent)
 	protected function render($view_file, $layout = 'default')
 	{
+
 		// load skin according to user role
 		$config = $this->mConfig['adminlte'];
 		$this->mBodyClass = $config['body_class'][$this->mUserMainGroup];
@@ -158,4 +159,5 @@ class Admin_Controller extends MY_Controller {
 		$this->mViewData['crud_output'] = $crud_data->output;
 		$this->render('crud');
 	}
+
 }

@@ -108,11 +108,11 @@ class Pages_model extends MY_Model {
 		  p.slug,
 		  catp.page_id
           FROM cat_pages catp                 
-                  LEFT JOIN  pages p ON p.id = catp.cat_id 
+                  LEFT JOIN  pages p ON p.id = catp.page_id 
                    
           {$condition}         
                 
-        group by p.id
+        
         ";
         $limit = " limit ".$offset.",".$limit;
         $sql = $sql.$limit;
@@ -125,6 +125,7 @@ class Pages_model extends MY_Model {
 
 
         if(count($ret['rows']) > 0){
+
             foreach($ret['rows'] as $key=>$val){
                 $ret['rows'][$key]['tags'] = $this->get_pages_tags("tagp.page_id=".$val['page_id']);
             }
@@ -136,18 +137,18 @@ class Pages_model extends MY_Model {
     }
 
     public function get_pages_tags($condition='', $limit=500, $offset=0, $sort_by = '', $sort_order = 'desc') {
-        $this->db->cache_delete();
+        //$this->db->cache_delete();
         $this->db->cache_on();
 
         $condition = rtrim($condition,' AND');
         $condition = (!empty($condition))?' WHERE '.$condition:' where 1 ';
 
-        $sql = "SELECT 
+       $sql = "SELECT 
 		SQL_CALC_FOUND_ROWS
-		  t.tag
-		
+		  t.tag,
+		  t.id
           FROM tag_pages tagp                 
-                  LEFT JOIN  tags t ON t.id = tagp.tag_id 
+                  LEFT JOIN tags t ON t.id = tagp.tag_id 
                    
           {$condition}         
                 

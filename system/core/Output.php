@@ -795,26 +795,22 @@ class CI_Output {
 
 		if (isset($_SERVER['HTTP_IF_MODIFIED_SINCE']) && $last_modified <= strtotime($_SERVER['HTTP_IF_MODIFIED_SINCE']))
 		{
-            header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');
-            header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
-            header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
-            header('Cache-Control: post-check=0, pre-check=0', FALSE);
-            header('Pragma: no-cache');
+
 			$this->set_status_header(304);
 			exit;
 		}
 		else
 		{
-			//header('Pragma: public');
-			//header('Cache-Control: max-age='.$max_age.', public');
-			//header('Expires: '.gmdate('D, d M Y H:i:s', $expiration).' GMT');
-			//header('Last-modified: '.gmdate('D, d M Y H:i:s', $last_modified).' GMT');
+			header('Pragma: public');
+			header('Cache-Control: max-age='.$max_age.', public');
+			header('Expires: '.gmdate('D, d M Y H:i:s', $expiration).' GMT');
+			header('Last-modified: '.gmdate('D, d M Y H:i:s', $last_modified).' GMT');
 
-            header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');
+            /*header('Expires: Sat, 26 Jul 1997 05:00:00 GMT');
             header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");
             header('Cache-Control: no-cache, no-store, must-revalidate, max-age=0');
             header('Cache-Control: post-check=0, pre-check=0', FALSE);
-            header('Pragma: no-cache');
+            header('Pragma: no-cache');*/
 		}
 	}
 

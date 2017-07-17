@@ -53,7 +53,7 @@ class MY_Controller extends MX_Controller {
 		$this->mCtrler = $this->router->fetch_class();
 		$this->mAction = $this->router->fetch_method();
 		$this->mMethod = $this->input->server('REQUEST_METHOD');
-		
+
 		// initial setup
 		$this->_setup();
 	}

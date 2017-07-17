@@ -61,7 +61,7 @@ class Pages extends MY_Controller {
             /*---------------- Get Tags ---------------*/
             $this->load->model('Pages_model');
             $condition = " catp.cat_id =  {$id} " ;
-            $this->mViewData['tags'] = $this->Pages_model->get_category_tags($condition);
+            $this->mViewData['pages'] = $this->Pages_model->get_category_tags($condition);
             //cidb($this->mViewData['tags'] );
             /*---------------- Tags ends ---------------*/
 

@@ -167,9 +167,11 @@ class File_model extends MY_Model {
         $limit = " limit ".$offset.",".$limit;
         $sql = $sql.$limit;
         $ret['rows'] = $this->db->query($sql)->result_array();
+
         //echo $this->db->last_query();
         $result = $this->db->query("SELECT FOUND_ROWS() as totalItems")->row_array();
         $ret['num_rows'] = $result['totalItems'];
+        $this->db->cache_off();
         return $ret;
 
     }

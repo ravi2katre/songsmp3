@@ -15,15 +15,23 @@ $name = (isset($cat_name))?$cat_name:$mPageTitle;
                 }
                 ?>            </div>
             <div class="movie_details">
-                <ul>
+
                     <?php
-                    if(isset($tags['rows']) && count($tags['rows']) > 0){
-                        foreach($tags['rows'] as $key=>$val){
-                            cidb($val);
+                    $li = '';
+                    if(isset($pages['rows']) && count($pages['rows']) > 0){
+                        foreach($pages['rows'] as $key=>$val){
+                            //cidb($val);
+                            if(isset($pages['rows']) && count($pages['rows']) > 0){
+                                $li .= "<li>";
+                                $li .= implode(",",array_column($val['tags']['rows'], 'tag'))." : <a href='{$val['slug']}' >".$val['name']."</a>";
+                                $li .= "</li>";
+                            }
                         }
                     }
 
                     ?>
+                <ul>
+                    <?php echo $li; ?>
                 </ul>
             </div>
         </div>
