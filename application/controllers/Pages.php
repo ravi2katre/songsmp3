@@ -17,6 +17,25 @@ class Pages extends MY_Controller {
 
 	public function index()
 	{
+
+        $path = 'E:\wamp64\www\RAVI\songsmp3\upload_files/5/6/10/11/';
+        /*function recursive_glob($pattern) {
+            $first_files = glob($pattern);
+            foreach (glob(dirname($pattern).'/*') as $dir) {
+                $first_files = array_merge($first_files, recursive_glob($dir.'/'.basename($pattern)));
+            }
+            return $first_files;
+        }
+        print_r(recursive_glob($path));exit;*/
+
+
+
+
+
+
+
+        //print_r($paths);exit;
+
 	   //print_r($this->input->get_post());
         //$this->output->cache(1);
 	    //$this->mViewData['list'] = $this->File_model->get_files();
