@@ -16,7 +16,7 @@
     'use strict';
 
     var isOnGitHub = window.location.hostname === 'blueimp.github.io',
-        url = isOnGitHub ? '//jquery-file-upload.appspot.com/' : 'fileupload';
+        url = isOnGitHub ? '//jquery-file-upload.appspot.com/' : 'fileupload/';
 
     angular.module('demo', [
         'blueimp.fileupload'
@@ -76,6 +76,7 @@
                         return state;
                     };
                     file.$destroy = function () {
+                        //alert(file.deleteUrl);return false;
                         state = 'pending';
                         return $http({
                             url: file.deleteUrl,

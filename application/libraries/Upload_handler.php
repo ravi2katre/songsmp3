@@ -10,9 +10,9 @@
  * https://opensource.org/licenses/MIT
  */
 
-class UploadHandler
+class Upload_handler
 {
-
+    protected $CI;
     protected $options;
 
     // PHP File Upload error message codes:
@@ -41,9 +41,10 @@ class UploadHandler
     protected $image_objects = array();
 
     public function __construct($options = null, $initialize = true, $error_messages = null) {
+        $this->CI =& get_instance();
         $this->response = array();
         $this->options = array(
-            'script_url' => $this->get_full_url().'/fileupload/'.$this->basename($this->get_server_var('SCRIPT_NAME')),
+            'script_url' => $this->get_full_url().'/'.$this->basename($this->get_server_var('REQUEST_URI')),
             'upload_dir' => dirname($this->get_server_var('SCRIPT_FILENAME')).'/files/',
             'upload_url' => $this->get_full_url().'/files/',
             'input_stream' => 'php://input',
@@ -234,7 +235,7 @@ class UploadHandler
     }
 
     protected function get_query_separator($url) {
-        return strpos($url, '?') === false ? '?' : '&';
+        return strpos($url, '?') === false ? '/?' : '&';
     }
 
     protected function get_download_url($file_name, $version = null, $direct = false) {
@@ -1148,6 +1149,8 @@ class UploadHandler
 
     protected function handle_form_data($file, $index) {
         // Handle form data, e.g. $_POST['description'][$index]
+        //$this->CI->load->helper('general');
+        //logit(print_r($_POST,true),'handle_form_data');
     }
 
     protected function get_version_param() {
@@ -1388,6 +1391,8 @@ class UploadHandler
 
     protected function basename($filepath, $suffix = null) {
         $splited = preg_split('/\//', rtrim ($filepath, '/ '));
+        //$this->CI->load->helper('general');
+        //logit(substr(basename('X'.$splited[count($splited)-1], $suffix), 1),'path') ;
         return substr(basename('X'.$splited[count($splited)-1], $suffix), 1);
     }
 }

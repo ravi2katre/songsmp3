@@ -1,17 +1,23 @@
 
+<div class="card">
+    <div class="card-header title_bar">
+        <h2> <?php echo $page_title; ?></h2>
+    </div>
+    <div class="card-block">
 
-    <!-- Bootstrap styles -->
-    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+
+<!-- Bootstrap styles -->
+    <!--link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css"-->
     <!-- Generic page styles -->
-    <link rel="stylesheet" href="assets/jQuery-File-Upload/css/style.css">
+    <!--link rel="stylesheet" href="<?php //echo base_url('assets/jQuery-File-Upload/css/style.css') ?> " -->
     <!-- blueimp Gallery styles -->
     <link rel="stylesheet" href="//blueimp.github.io/Gallery/css/blueimp-gallery.min.css">
     <!-- CSS to style the file input field as button and adjust the Bootstrap progress bars -->
-    <link rel="stylesheet" href="assets/jQuery-File-Upload/css/jquery.fileupload.css">
-    <link rel="stylesheet" href="assets/jQuery-File-Upload/css/jquery.fileupload-ui.css">
+    <link rel="stylesheet" href="<?php echo base_url('assets/jQuery-File-Upload/css/jquery.fileupload.css'); ?> ">
+    <link rel="stylesheet" href="<?php echo base_url('assets/jQuery-File-Upload/css/jquery.fileupload-ui.css'); ?> ">
     <!-- CSS adjustments for browsers with JavaScript disabled -->
-    <noscript><link rel="stylesheet" href="assets/jQuery-File-Upload/css/jquery.fileupload-noscript.css"></noscript>
-    <noscript><link rel="stylesheet" href="assets/jQuery-File-Upload/css/jquery.fileupload-ui-noscript.css"></noscript>
+    <noscript><link rel="stylesheet" href="<?php echo base_url('assets/jQuery-File-Upload/css/jquery.fileupload-noscript.css'); ?>"></noscript>
+    <noscript><link rel="stylesheet" href="<?php echo base_url('assets/jQuery-File-Upload/css/jquery.fileupload-ui-noscript.css'); ?>"></noscript>
     <style>
         /* Hide Angular JS elements before initializing */
         .ng-cloak {
@@ -20,13 +26,16 @@
     </style>
 
 
-<div class="container">
+
 
 
     <!-- The file upload form used as target for the file upload widget -->
-    <form id="fileupload" action="fileupload" method="POST" enctype="multipart/form-data" data-ng-app="demo" data-ng-controller="DemoFileUploadController" data-file-upload="options" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
+    <form id="fileupload"  action="fileupload/" method="POST" enctype="multipart/form-data" data-ng-app="demo" data-ng-controller="DemoFileUploadController"  data-file-upload="options" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
         <!-- Redirect browsers with JavaScript disabled to the origin page -->
-        <noscript><input type="hidden" name="redirect" value="fileupload"></noscript>
+        <noscript>
+            <input type="hidden" name="redirect" value="fileupload">
+
+        </noscript>
         <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
         <div class="row fileupload-buttonbar">
             <div class="col-lg-7">
@@ -58,6 +67,10 @@
         <!-- The table listing the files available for upload/download -->
         <table class="table table-striped files ng-cloak">
             <tr data-ng-repeat="file in queue" data-ng-class="{'processing': file.$processing()}">
+
+                <!-- ... -->
+                <td><input type="text"  name="title" ng-model="file.title" placeholder="Title"></td>
+                <!-- ... -->
                 <td data-ng-switch data-on="!!file.thumbnailUrl">
                     <div class="preview" data-ng-switch-when="true">
                         <a data-ng-href="{{file.url}}" title="{{file.name}}" download="{{file.name}}" data-gallery><img data-ng-src="{{file.thumbnailUrl}}" alt=""></a>
@@ -95,9 +108,9 @@
             </tr>
         </table>
     </form>
-    <br>
 
-</div>
+
+
 <!-- The blueimp Gallery widget -->
 <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-filter=":even">
     <div class="slides"></div>
@@ -111,7 +124,7 @@
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <script src="//ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
 <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
-<script src="assets/jQuery-File-Upload/js/vendor/jquery.ui.widget.js"></script>
+<script src="<?php echo base_url('assets/jQuery-File-Upload/js/vendor/jquery.ui.widget.js'); ?>"></script>
 <!-- The Load Image plugin is included for the preview images and image resizing functionality -->
 <script src="//blueimp.github.io/JavaScript-Load-Image/js/load-image.all.min.js"></script>
 <!-- The Canvas to Blob plugin is included for image resizing functionality -->
@@ -121,20 +134,32 @@
 <!-- blueimp Gallery script -->
 <script src="//blueimp.github.io/Gallery/js/jquery.blueimp-gallery.min.js"></script>
 <!-- The Iframe Transport is required for browsers without support for XHR file uploads -->
-<script src="assets/jQuery-File-Upload/js/jquery.iframe-transport.js"></script>
+<script src="<?php echo base_url('assets/jQuery-File-Upload/js/jquery.iframe-transport.js'); ?>"></script>
 <!-- The basic File Upload plugin -->
-<script src="assets/jQuery-File-Upload/js/jquery.fileupload.js"></script>
+<script src="<?php echo base_url('assets/jQuery-File-Upload/js/jquery.fileupload.js'); ?>"></script>
 <!-- The File Upload processing plugin -->
-<script src="assets/jQuery-File-Upload/js/jquery.fileupload-process.js"></script>
+<script src="<?php echo base_url('assets/jQuery-File-Upload/js/jquery.fileupload-process.js'); ?>"></script>
 <!-- The File Upload image preview & resize plugin -->
-<script src="assets/jQuery-File-Upload/js/jquery.fileupload-image.js"></script>
+<script src="<?php echo base_url('assets/jQuery-File-Upload/js/jquery.fileupload-image.js'); ?>"></script>
 <!-- The File Upload audio preview plugin -->
-<script src="assets/jQuery-File-Upload/js/jquery.fileupload-audio.js"></script>
+<script src="<?php echo base_url('assets/jQuery-File-Upload/js/jquery.fileupload-audio.js'); ?>"></script>
 <!-- The File Upload video preview plugin -->
-<script src="assets/jQuery-File-Upload/js/jquery.fileupload-video.js"></script>
+<script src="<?php echo base_url('assets/jQuery-File-Upload/js/jquery.fileupload-video.js'); ?>"></script>
 <!-- The File Upload validation plugin -->
-<script src="assets/jQuery-File-Upload/js/jquery.fileupload-validate.js"></script>
+<script src="<?php echo base_url('assets/jQuery-File-Upload/js/jquery.fileupload-validate.js'); ?>"></script>
 <!-- The File Upload Angular JS module -->
-<script src="assets/jQuery-File-Upload/js/jquery.fileupload-angular.js"></script>
+<script src="<?php echo base_url('assets/jQuery-File-Upload/js/jquery.fileupload-angular.js'); ?>"></script>
 <!-- The main application script -->
-<script src="assets/jQuery-File-Upload/js/app.js"></script>
+<script src="<?php echo base_url('assets/jQuery-File-Upload/js/app.js'); ?>"></script>
+
+    <script>
+    $('#fileupload').bind('fileuploadsubmit', function (e, data) {
+    data.formData = {cid: '<?php echo $cid ?>',title:data.files[0].title};
+    });
+
+
+    </script>
+
+
+    </div>
+</div>
