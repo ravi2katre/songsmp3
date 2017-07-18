@@ -18,16 +18,20 @@ application/composer.lock
 */config/development
 */logs/log-*.php
 */logs/!index.html
-*/cache/*
-*/uploads/*
+*/cache
+uploads
 */cache/!index.html
 */cache/!.htaccess
-
+application/cache
+sql/backup
+upload_files
+scan_dir
+application/config/database.php
+.idea/*
 ## Source map files (local gulp tasks will still produce .map for debug use) ###
 *.map
 
 ### SQL backup files ###
-sql/backup/*
 sql/backup/!index.html
 .idea/ci_bootstrap_3.iml
 .idea/dataSources.local.xml
@@ -36,5 +40,4 @@ sql/backup/!index.html
 .idea/modules.xml
 .idea/sqldialects.xml
 .idea/workspace.xml
-application/cache/
-sql/backup/
+/.gitignore

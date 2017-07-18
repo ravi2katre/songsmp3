@@ -17,7 +17,7 @@ class Fileupload extends MY_Controller
         error_reporting(E_ALL | E_STRICT);
         $options['upload_dir'] = FCPATH.'uploads/files/';
         $options['upload_url'] = base_url('uploads/files/');
-
+        mkdir_if_not_exist($options['upload_dir']);
         $this->load->library("UploadHandler",$options);
 
     }

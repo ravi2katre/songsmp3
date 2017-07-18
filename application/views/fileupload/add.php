@@ -1,26 +1,5 @@
-<!DOCTYPE HTML>
-<!--
-/*
- * jQuery File Upload Plugin AngularJS Demo
- * https://github.com/blueimp/jQuery-File-Upload
- *
- * Copyright 2013, Sebastian Tschan
- * https://blueimp.net
- *
- * Licensed under the MIT license:
- * https://opensource.org/licenses/MIT
- */
--->
-<html lang="en">
-<head>
-    <!-- Force latest IE rendering engine or ChromeFrame if installed -->
-    <!--[if IE]>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <![endif]-->
-    <meta charset="utf-8">
-    <title>jQuery File Upload Demo - AngularJS version</title>
-    <meta name="description" content="File Upload widget with multiple file selection, drag&amp;drop support, progress bars, validation and preview images, audio and video for AngularJS. Supports cross-domain, chunked and resumable file uploads and client-side image resizing. Works with any server-side platform (PHP, Python, Ruby on Rails, Java, Node.js, Go etc.) that supports standard HTML form file uploads.">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
     <!-- Bootstrap styles -->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
     <!-- Generic page styles -->
@@ -39,45 +18,11 @@
             display: none;
         }
     </style>
-</head>
-<body>
-<div class="navbar navbar-default navbar-fixed-top">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-fixed-top .navbar-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="https://github.com/blueimp/jQuery-File-Upload">jQuery File Upload</a>
-        </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li><a href="https://github.com/blueimp/jQuery-File-Upload/tags">Download</a></li>
-                <li><a href="https://github.com/blueimp/jQuery-File-Upload">Source Code</a></li>
-                <li><a href="https://github.com/blueimp/jQuery-File-Upload/wiki">Documentation</a></li>
-                <li><a href="https://blueimp.net">&copy; Sebastian Tschan</a></li>
-            </ul>
-        </div>
-    </div>
-</div>
+
+
 <div class="container">
-    <h1>jQuery File Upload Demo</h1>
-    <h2 class="lead">AngularJS version</h2>
-    <ul class="nav nav-tabs">
-        <li><a href="basic.html">Basic</a></li>
-        <li><a href="basic-plus.html">Basic Plus</a></li>
-        <li><a href="index.html">Basic Plus UI</a></li>
-        <li class="active"><a href="angularjs.html">AngularJS</a></li>
-        <li><a href="jquery-ui.html">jQuery UI</a></li>
-    </ul>
-    <br>
-    <blockquote>
-        <p>File Upload widget with multiple file selection, drag&amp;drop support, progress bars, validation and preview images, audio and video for AngularJS.<br>
-            Supports cross-domain, chunked and resumable file uploads and client-side image resizing.<br>
-            Works with any server-side platform (PHP, Python, Ruby on Rails, Java, Node.js, Go etc.) that supports standard HTML form file uploads.</p>
-    </blockquote>
-    <br>
+
+
     <!-- The file upload form used as target for the file upload widget -->
     <form id="fileupload" action="fileupload" method="POST" enctype="multipart/form-data" data-ng-app="demo" data-ng-controller="DemoFileUploadController" data-file-upload="options" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
         <!-- Redirect browsers with JavaScript disabled to the origin page -->
@@ -151,21 +96,7 @@
         </table>
     </form>
     <br>
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Demo Notes</h3>
-        </div>
-        <div class="panel-body">
-            <ul>
-                <li>The maximum file size for uploads in this demo is <strong>999 KB</strong> (default file size is unlimited).</li>
-                <li>Only image files (<strong>JPG, GIF, PNG</strong>) are allowed in this demo (by default there is no file type restriction).</li>
-                <li>Uploaded files will be deleted automatically after <strong>5 minutes or less</strong> (demo files are stored in memory).</li>
-                <li>You can <strong>drag &amp; drop</strong> files from your desktop on this webpage (see <a href="https://github.com/blueimp/jQuery-File-Upload/wiki/Browser-support">Browser support</a>).</li>
-                <li>Please refer to the <a href="https://github.com/blueimp/jQuery-File-Upload">project website</a> and <a href="https://github.com/blueimp/jQuery-File-Upload/wiki">documentation</a> for more information.</li>
-                <li>Built with the <a href="http://getbootstrap.com/">Bootstrap</a> CSS framework and Icons from <a href="http://glyphicons.com/">Glyphicons</a>.</li>
-            </ul>
-        </div>
-    </div>
+
 </div>
 <!-- The blueimp Gallery widget -->
 <div id="blueimp-gallery" class="blueimp-gallery blueimp-gallery-controls" data-filter=":even">
@@ -207,5 +138,3 @@
 <script src="assets/jQuery-File-Upload/js/jquery.fileupload-angular.js"></script>
 <!-- The main application script -->
 <script src="assets/jQuery-File-Upload/js/app.js"></script>
-</body>
-</html>
