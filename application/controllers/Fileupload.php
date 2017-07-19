@@ -55,7 +55,7 @@ class Fileupload extends MY_Controller
 
     function add(){
        // $cid = ($this->input->post('cid') > 0) ?$this->input->post('cid'):0;
-        $cid = 13;
+        $this->mViewData['cid'] = $cid = 5;
         if($cid > 0){
             $rows = $this->File_model->get_categories("c.id=".$cid);
             $row['cat'] = $rows['rows'][0];
@@ -69,11 +69,14 @@ class Fileupload extends MY_Controller
 
     function insert_detail($file){
 
-        if(isset($file['error'])){
+        if(isset($file->error)){
             return true;
         }
 
         $data = pathinfo($file->url);
+        if(empty($data['filename']) || empty($file->size)){
+            return true;
+        }
         //$log = print_r($data,true);
         $insert = array(
             'name' => $data['filename'],
@@ -98,11 +101,11 @@ class Fileupload extends MY_Controller
         function delete_file_row($file){
         $file_name = key($file);
         $data = pathinfo($file_name);
-        $condition = 'cid='.$this->session->userdata['cat']['id'];
-        $condition .= " AND name='".$data['filename']."'";
+        $condition = "cid=".$this->session->userdata['cat']['id'];
+        $condition .= " AND name='".rawurlencode($data['filename'])."'";
         $this->File_model->delete($condition);
 
-        logit(print_r($data,true),'insert');
+        logit(print_r($data,true),'delete_file_row');
 
     }
 }
