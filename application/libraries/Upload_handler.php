@@ -65,10 +65,12 @@ class Upload_handler
                 'PATCH',
                 'DELETE'
             ),
+            'cid'=>0,
             'access_control_allow_headers' => array(
                 'Content-Type',
                 'Content-Range',
                 'Content-Disposition'
+
             ),
             // By default, allow redirects to the referer protocol+host:
             'redirect_allow_target' => '/^'.preg_quote(
@@ -274,6 +276,11 @@ class Upload_handler
         if ($this->options['access_control_allow_credentials']) {
             $file->deleteWithCredentials = true;
         }
+        if ($this->options['cid']) {
+            $file->cid = $this->options['cid'];
+            $file->editUrl = $this->options['script_url'];
+        }
+
     }
 
     // Fix for overflowing signed 32 bit integers,

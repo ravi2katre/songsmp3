@@ -80,7 +80,15 @@ class Files extends Admin_Controller {
         $crud->callback_after_insert(array($this,'callback_category'));
         $crud->callback_after_update(array($this,'callback_category'));
 
+        //$crud->add_action('More', '', 'admin/fileupload/add/13','ui-icon-plus');
+        $crud->add_action('Files', "http://i.imgur.com/N8SN8ZS.png", 'Files','',array($this,'just_a_test'));
         $this->render_crud();
+    }
+
+
+    function just_a_test($primary_key , $row)
+    {
+        return site_url('admin/fileupload/add/').$primary_key;
     }
 
     function callback_category($post_array,$primary_key){

@@ -47,6 +47,7 @@
         .controller('DemoFileUploadController', [
             '$scope', '$http', '$filter', '$window',
             function ($scope, $http) {
+
                 $scope.options = {
                     url: url
                 };
@@ -90,6 +91,12 @@
                                 state = 'rejected';
                             }
                         );
+                    };
+                    file.$edit = function () {
+                        //alert("okkk");
+                        console.log(file);
+                        window.location.href=file.editUrl+'/edit/'+file.cid+"/"+file.name;
+
                     };
                 } else if (!file.$cancel && !file._index) {
                     file.$cancel = function () {

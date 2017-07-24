@@ -71,7 +71,7 @@ $config['ci_bootstrap'] = array(
             'children'  => array(
                 'Pages'			=> 'files/pages',
                 'Categories'		=> 'files/category',
-                'Files'	=> 'files/file',
+                //'Files'	=> 'files/file',
                 'Tags'	=> 'files/tags',
             )
         ),

@@ -23,10 +23,10 @@
 
 
     <!-- The file upload form used as target for the file upload widget -->
-    <form id="fileupload"  action="fileupload/" method="POST" enctype="multipart/form-data" data-ng-app="demo" data-ng-controller="DemoFileUploadController"  data-file-upload="options" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
+    <form id="fileupload"  action="admin/fileupload/" method="POST" enctype="multipart/form-data" data-ng-app="demo" data-ng-controller="DemoFileUploadController"  data-file-upload="options" data-ng-class="{'fileupload-processing': processing() || loadingFiles}">
         <!-- Redirect browsers with JavaScript disabled to the origin page -->
         <noscript>
-            <input type="hidden" name="redirect" value="fileupload">
+            <input type="hidden" name="redirect" value="admin/fileupload">
 
         </noscript>
         <!-- The fileupload-buttonbar contains buttons to add/delete files and start/cancel the upload -->
@@ -97,6 +97,11 @@
                         <i class="glyphicon glyphicon-trash"></i>
                         <span>Delete</span>
                     </button>
+                    <button data-ng-controller="FileDestroyController" type="button" class="btn destroy" data-ng-click="file.$edit()" data-ng-hide="!file.$edit">
+                        <i class="glyphicon glyphicon-edit"></i>
+                        <span>Edit</span>
+                    </button>
+
                 </td>
             </tr>
         </table>

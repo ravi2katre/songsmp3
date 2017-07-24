@@ -59,7 +59,7 @@ class StaticAnalyser
         $analysis = new Analysis();
         reset($tokens);
         $token = '';
-        $imports = ['swg' => 'Swagger\Annotations']; // Use @SWG\* for swagger annotations (unless overwritten by a use statement)
+        $imports = Analyser::$defaultImports; // Use @SWG\* for swagger annotations (unless overwritten by a use statement)
 
         $parseContext->uses = [];
         $definitionContext = $parseContext; // Use the parseContext until a definitionContext  (class or trait) is created.
@@ -90,6 +90,12 @@ class StaticAnalyser
                     continue;
                 }
                 $token = $this->nextToken($tokens, $parseContext);
+
+                if (is_string($token) && $token === '{') {
+                    // php7 anonymous classes (i.e. new class { public function foo() {} };)
+                    continue;
+                }
+
                 $definitionContext = new Context(['class' => $token[1], 'line' => $token[2]], $parseContext);
                 if ($classDefinition) {
                     $analysis->addClassDefinition($classDefinition);
@@ -213,10 +219,14 @@ class StaticAnalyser
                     }
 
                     $parseContext->uses[$alias] = $target;
-                    foreach (Analyser::$whitelist as $namespace) {
-                        if (strcasecmp(substr($target, 0, strlen($namespace)), $namespace) === 0) {
-                            $imports[strtolower($alias)] = $target;
-                            break;
+                    if (Analyser::$whitelist === false) {
+                        $imports[strtolower($alias)] = $target;
+                    } else {
+                        foreach (Analyser::$whitelist as $namespace) {
+                            if (strcasecmp(substr($target, 0, strlen($namespace)), $namespace) === 0) {
+                                $imports[strtolower($alias)] = $target;
+                                break;
+                            }
                         }
                     }
                 }

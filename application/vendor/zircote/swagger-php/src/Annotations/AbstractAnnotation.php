@@ -93,9 +93,17 @@ abstract class AbstractAnnotation implements JsonSerializable
             $this->_context->annotations = [];
         }
         $this->_context->annotations[] = $this;
+        $nestedContext = new Context(['nested' => $this], $this->_context);
         foreach ($properties as $property => $value) {
             if (property_exists($this, $property)) {
                 $this->$property = $value;
+                if (is_array($value)) {
+                    foreach ($value as $key => $annotation) {
+                        if (is_object($annotation) && $annotation instanceof AbstractAnnotation) {
+                            $this->{$property}[$key] = $this->nested($annotation, $nestedContext);
+                        }
+                    }
+                }
             } elseif ($property !== 'value') {
                 $this->$property = $value;
             } elseif (is_array($value)) {
@@ -143,7 +151,7 @@ abstract class AbstractAnnotation implements JsonSerializable
     public function merge($annotations, $ignore = false)
     {
         $unmerged = [];
-        $nextedContext = new Context(['nested' => $this], $this->_context);
+        $nestedContext = new Context(['nested' => $this], $this->_context);
         foreach ($annotations as $annotation) {
             $found = false;
             foreach (static::$_nested as $class => $property) {
@@ -153,10 +161,10 @@ abstract class AbstractAnnotation implements JsonSerializable
                         if ($this->$property === null) {
                             $this->$property = [];
                         }
-                        array_push($this->$property, $this->nested($annotation, $nextedContext));
+                        array_push($this->$property, $this->nested($annotation, $nestedContext));
                         $found = true;
                     } elseif ($this->$property === null) {
-                        $this->$property = $this->nested($annotation, $nextedContext);
+                        $this->$property = $this->nested($annotation, $nestedContext);
                         $found = true;
                     }
                     break;
@@ -168,7 +176,7 @@ abstract class AbstractAnnotation implements JsonSerializable
         }
         if (!$ignore) {
             foreach ($unmerged as $annotation) {
-                $this->_unmerged[] = $this->nested($annotation, $nextedContext);
+                $this->_unmerged[] = $this->nested($annotation, $nestedContext);
             }
         }
         return $unmerged;
@@ -268,11 +276,15 @@ abstract class AbstractAnnotation implements JsonSerializable
             }
             $keyField = $nested[1];
             $object = new stdClass();
-            foreach ($this->$property as $item) {
-                $key = $item->$keyField;
-                if ($key && empty($object->$key)) {
-                    $object->$key = $item->jsonSerialize();
-                    unset($object->$key->$keyField);
+            foreach ($this->$property as $key => $item) {
+                if (is_numeric($key) === false && is_array($item)) {
+                    $object->$key = $item;
+                } else {
+                    $key = $item->$keyField;
+                    if ($key && empty($object->$key)) {
+                        $object->$key = $item->jsonSerialize();
+                        unset($object->$key->$keyField);
+                    }
                 }
             }
             $data->$property = $object;
@@ -324,7 +336,7 @@ abstract class AbstractAnnotation implements JsonSerializable
         }
         // Report conflicting key
 
-        foreach (static::$_nested as $nested) {
+        foreach (static::$_nested as $annotationClass => $nested) {
             if (is_string($nested) || count($nested) === 1) {
                 continue;
             }
@@ -334,8 +346,11 @@ abstract class AbstractAnnotation implements JsonSerializable
             }
             $keys = [];
             $keyField = $nested[1];
-            foreach ($this->$property as $item) {
-                if (empty($item->$keyField)) {
+            foreach ($this->$property as $key => $item) {
+                if (is_array($item) && is_numeric($key) === false) {
+                    Logger::notice($this->identity() . '->' . $property . ' is an object literal, use nested @' . str_replace('Swagger\\Annotations\\', 'SWG\\', $annotationClass) . '() annotation(s) in ' . $this->_context);
+                    $keys[$key] = $item;
+                } elseif (empty($item->$keyField)) {
                     Logger::notice($item->identity() . ' is missing key-field: "' . $keyField . '" in ' . $item->_context);
                 } elseif (isset($keys[$item->$keyField])) {
                     Logger::notice('Multiple ' . $item->_identity([]) . ' with the same ' . $keyField . '="' . $item->$keyField . "\":\n  " . $item->_context . "\n  " . $keys[$item->$keyField]->_context);
@@ -401,7 +416,7 @@ abstract class AbstractAnnotation implements JsonSerializable
     {
         $parents = $path;
         array_pop($parents);
-        
+
         $valid = true;
         $blacklist = [];
         if (is_object($fields)) {
@@ -411,7 +426,7 @@ abstract class AbstractAnnotation implements JsonSerializable
             $skip[] = $fields;
             $blacklist = property_exists($fields, '_blacklist') ? $fields::$_blacklist : [];
         }
-        
+
         foreach ($fields as $field => $value) {
             if ($value === null || is_scalar($value) || in_array($field, $blacklist)) {
                 continue;
@@ -473,7 +488,6 @@ abstract class AbstractAnnotation implements JsonSerializable
             return true;
         }
         switch ($type) {
-
             case 'string':
                 return is_string($value);
 
@@ -507,9 +521,9 @@ abstract class AbstractAnnotation implements JsonSerializable
         }
     }
     /**
-     * Wrap the context with a refernece to the annotation it is nested in.
+     * Wrap the context with a reference to the annotation it is nested in.
      * @param AbstractAnnotation $annotation
-     * @param Context $nextedContext
+     * @param Context $nestedContext
      * @return AbstractAnnotation
      */
     private function nested($annotation, $nestedContext)

@@ -79,8 +79,9 @@ if ($error) {
 if ($options['help']) {
     $help = <<<EOF
 
-usage: swagger [/path/to/project] [--output ./swagger.json] ...
+Usage: swagger [--option value] [/path/to/project ...]
 
+Options:
   --output (-o)     Path to store the generated documentation.
   --stdout          Write to the standard output.
   --exclude (-e)    Exclude path(s).
@@ -127,7 +128,7 @@ set_error_handler(function ($errno, $errstr, $file, $line) use ($errorTypes) {
     if (!(error_reporting() & $errno)) {
         return; // This error code is not included in error_reporting
     }
-    $type = @$errorTypes[$errno] ?: 'ERROR';
+    $type = array_key_exists($errno, $errorTypes) ? $errorTypes[$errno] : 'ERROR';
     error_log('[' . $type . '] '.$errstr .' in '.$file.' on line '.$line);
     if ($type === 'ERROR') {
         exit($errno);
