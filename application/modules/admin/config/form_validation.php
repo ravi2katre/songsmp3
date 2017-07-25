@@ -21,6 +21,50 @@ $config = array(
 			'rules'		=> 'required',
 		),
 	),
+    'fileupload/edit' => array(
+        /*array(
+            'field'		=> 'unsynchronised_lyric',
+            'label'		=> 'unsynchronised_lyric',
+            'rules'		=> 'required',
+        ),*/
+
+        array(
+            'field' => 'title',
+            'label' => 'title',
+            'rules' => 'required',
+        ),
+        array(
+            'field' => 'artist',
+            'label' => 'artist',
+            'rules' => 'required',
+        ),
+        array(
+            'field' => 'album',
+            'label' => 'album',
+            'rules' => 'required',
+        ),
+        array(
+            'field' => 'year',
+            'label' => 'year',
+            'rules' => 'required',
+        ),
+        /* array(
+             'field'		=> 'genre',
+             'label'		=> 'genre',
+             'rules'		=> 'required',
+         ),*/
+        array(
+            'field' => 'comment',
+            'label' => 'comment',
+            'rules' => 'required',
+        ),
+        /*array(
+            'field'		=> 'track',
+            'label'		=> 'track',
+            'rules'		=> 'required',
+        ),*/
+    ),
+
 
 	// Create User
 	'user/create' => array(

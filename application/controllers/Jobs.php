@@ -38,18 +38,22 @@ class Jobs extends MY_Controller {
 
         return $audio;
     }
-        public function writeId3Tags()
+
+    public function writeId3Tags($mp3File, $tagData = array())
         {
-            $mp3File = 'E:\wamp64\www\phpstrom\zjmaza\uploads\mp3\aeeena_Badal Ki Tarah Jhoom Ke.mp3';
+            if (!file_exists($mp3File)) {
+                die('File not exist.');
+            }
+            // $mp3File = 'E:\wamp64\www\phpstrom\zjmaza\uploads\mp3\aeeena_Badal Ki Tarah Jhoom Ke.mp3';
             $tagwriter = new Tags();
             $tagwriter->filename = $mp3File;
             $tagwriter->tagformats = array('id3v1', 'id3v2.3');
             $tagwriter->overwrite_tags = true;
             $tagwriter->tag_encoding = 'UTF-8';
-            $tagwriter->remove_other_tags = true;
+            $tagwriter->remove_other_tags = false;
 
             $hash = ' '.substr(md5(mt_rand()), 0, 8);
-            $tagData = array(
+            /*$tagData = array(
                 'title' => array('My Song'.$hash),
                 'artist' => array('The Artist'.$hash),
                 'album' => array('Greatest Hits'.$hash),
@@ -57,11 +61,12 @@ class Jobs extends MY_Controller {
                 'genre' => array('Electronic'.$hash),
                 'comment' => array('excellent!'.$hash),
                 'track' => array('04/16'.$hash),
-            );
+            );*/
             $tagwriter->tag_data = $tagData;
             $tagwriter->WriteTags();
 
-            exit;
+
+            return true;
         }
 
 

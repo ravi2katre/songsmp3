@@ -76,7 +76,7 @@ class Form {
 	}
 
 	// Update Rule Group for validation
-	// Reference: http://www.codeigniter.com/user_guide/libraries/form_validation.html#calling-a-specific-rule-group
+    // Reference:
 	public function set_rule_group($rule_group)
 	{
 		$this->mRuleGroup = $rule_group;

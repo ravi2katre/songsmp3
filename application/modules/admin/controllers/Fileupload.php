@@ -117,15 +117,49 @@ class Fileupload extends Admin_Controller
 
     }
 
-    function edit($cid,$name){
+    function edit($cid = 0, $name = '')
+    {
+        $this->load->library('form_builder');
         //$file_name = key($name);
+        //$this->mViewData['name'] = $name;
+        //$this->mViewData['cid'] = $cid;
         $data = pathinfo($name);
         $condition = 'f.cid='.$cid;
         $condition .= " AND f.name='".$data['filename']."'";
         $this->mViewData['row'] = $this->File_model->get_files($condition);
         $row = $this->mViewData['row']['rows'][0];
         $this->load->library('../controllers/Jobs');
-        $this->mViewData['mp3info'] = $this->jobs->mp3info(FCPATH.$row['folder'].rawurldecode($row['name']).".".$row['ext']);
+        $file = FCPATH . $row['folder'] . rawurldecode($row['name']) . "." . $row['ext'];
+
+        //cidb($this->mViewData['mp3info']);exit;
+        $form = $this->form_builder->create_form("admin/fileupload/edit/" . $cid . "/" . $name);
+        $form->set_rule_group('fileupload/edit');
+
+        if ($form->validate()) {
+            // $hash = ' '.substr(md5(mt_rand()), 0, 8);
+            $hash = '';
+            $tagData = array(
+                //'unsynchronised_lyric' => $this->input->post('unsynchronised_lyric'),
+                'title' => array($this->input->post('title') . $hash),
+                'artist' => array($this->input->post('artist') . $hash),
+                'album' => array($this->input->post('album') . $hash),
+                'year' => array($this->input->post('year') . $hash),
+                //'genre' => $this->input->post('genre'),
+                'comment' => array($this->input->post('comment') . $hash),
+                'track' => array($this->input->post('track') . $hash),
+            );
+            logit(print_r($tagData, true), 'tagname_changes');
+            $this->jobs->writeId3Tags($file, $tagData);
+//print_r($result);exit;
+        }
+
+        //$groups = $this->ion_auth->groups()->result();
+        // unset($groups[0]);	// disable creation of "webmaster" account
+        //$this->mViewData['groups'] = $groups;
+        $this->mPageTitle = 'Edit File Tags';
+        $this->mViewData['mp3info'] = $this->jobs->mp3info($file);
+        $this->mViewData['form'] = $form;
+        // $this->render('panel/admin_user_create');
         $this->render('fileupload/edit');
     }
 }
