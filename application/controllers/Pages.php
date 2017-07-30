@@ -78,6 +78,8 @@ class Pages extends MY_Controller {
 
         if($this->mViewData['list']['num_rows']==0){
             /*---------------- Get Tags ---------------*/
+            $condition = "c.id = " . $id;
+            $this->mViewData['cat_detail'] = $this->File_model->get_categories($condition, $limit, ($offset * $limit) - $limit);
             $this->load->model('Pages_model');
             $condition = " catp.cat_id =  {$id} " ;
             $this->mViewData['pages'] = $this->Pages_model->get_category_tags($condition);
@@ -133,7 +135,7 @@ class Pages extends MY_Controller {
 
         $this->mViewData['list'] = $this->File_model->get_files('f.id='.$file_id);
         $this->mViewData['list'] = $this->mViewData['list']['rows'][0];
-        $this->mPageTitle = $this->mViewData['mPageTitle'] = str_replace("-", " ", $slug);
+        $this->mPageTitle = $this->mViewData['mPageTitle'] = str_replace("-", " ", rawurldecode($this->mViewData['list']['name']));
 
         //cidb($this->mViewData['list']);exit;
         $this->render('pages/file_show', $this->controller_page_layout);
@@ -186,7 +188,7 @@ class Pages extends MY_Controller {
         $result = $this->File_model->get_files($condition);
         $list= $result['rows'][0];
 //cidb($result);exit;
-        $fileName= $list['name'].".".$list['ext'];
+        $fileName = rawurldecode($list['name']) . "." . $list['ext'];
         if ($fileName) {
             $file = download_url ( $list['folder'])  . $fileName;
             // check file exists
@@ -198,7 +200,8 @@ class Pages extends MY_Controller {
                 //force download
                 force_download ( $fileName, $data );
             } else {
-                echo "ffffff";exit;
+                echo "Error in file";
+                exit;
                 // Redirect to base url
                 redirect ( base_url () );
             }

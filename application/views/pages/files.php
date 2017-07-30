@@ -1,4 +1,4 @@
-<?php  $this->load->view('pages/_partials/cat_detail_box', $list); ?>
+<?php $this->load->view('pages/_partials/cat_detail_box', $cat_detail['rows'][0]); ?>
 <br>
 <div class="card">
     <div class="card-header title_bar">

@@ -14,6 +14,7 @@ class Test extends MY_Controller {
 	}
 
 	public function test(){
+        //cidb($this->agent->browser);exit;
         $this->render('home', '3_column');
     }
 

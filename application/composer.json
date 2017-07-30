@@ -6,6 +6,8 @@
         "league/csv": "^7.0",
         "mailgun/mailgun-php": "1.8.*",
         "zircote/swagger-php": "^2.0",
-        "phansys/getid3": "^2.1@dev"
+      "phansys/getid3": "^2.1@dev",
+      "omnipay/omnipay": "*",
+      "softcommerce/omnipay-paytrace": "~1.0"
     }
 }

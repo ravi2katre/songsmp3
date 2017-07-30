@@ -5,7 +5,8 @@
 <?php echo form_open('download',array('id' => 'myForm')); ?>
 <input type="hidden" name="download_key" value="<?php echo serialize_data($list['id']); ?>" >
 <div class="card">
-    <h3 class="card-header title_bar"><i class="fa fa-music"></i> <?php echo $mPageTitle.'.'.$list['ext']; ?></h3>
+    <h3 class="card-header title_bar"><i
+                class="fa fa-music"></i> <?php echo rawurldecode($mPageTitle) . '.' . $list['ext']; ?></h3>
     <div class="card-block">
         <a href="javascript:void(0)"  class="buttonDownload">Download</a>
     </div>
