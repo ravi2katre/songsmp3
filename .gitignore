@@ -23,6 +23,7 @@ uploads
 */cache/!index.html
 */cache/!.htaccess
 application/cache
+application/vendor
 sql/backup
 upload_files
 scan_dir
