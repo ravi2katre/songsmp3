@@ -11,9 +11,10 @@ $name = (isset($cat_name))?$cat_name:$mPageTitle;
                     // echo '<img  class="card-img-top img-fluid" src="https://scontent.fnag1-1.fna.fbcdn.net/v/t1.0-9/12821427_1140809332604262_1569773744317899529_n.jpg?oh=4b61a93d146354771040b15c962db90e&oe=59C8F62F" alt="'.$mPageTitle.'">';
 
                 }else{
-                    echo '<img class="card-img-top img-fluid" src="uploads/cat_images/'.$thumb.'" alt="'.$mPageTitle.'">';
+                    echo '<img class="card-img-top img-fluid float-left"  src="uploads/cat_images/' . $thumb . '" alt="' . $mPageTitle . '">';
                 }
-                ?>            </div>
+                ?>
+            </div>
             <div class="movie_details">
 
                     <?php

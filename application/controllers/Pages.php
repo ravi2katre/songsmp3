@@ -137,6 +137,13 @@ class Pages extends MY_Controller {
         $this->mViewData['list'] = $this->mViewData['list']['rows'][0];
         $this->mPageTitle = $this->mViewData['mPageTitle'] = str_replace("-", " ", rawurldecode($this->mViewData['list']['name']));
 
+        /*---------------- Get Tags ---------------*/
+
+        $this->load->model('Pages_model');
+        $condition = " catp.cat_id =  {$this->mViewData['list']['cid']} ";
+        $this->mViewData['pages'] = $this->Pages_model->get_category_tags($condition);
+        //cidb($this->mViewData['tags'] );
+        /*---------------- Tags ends ---------------*/
         //cidb($this->mViewData['list']);exit;
         $this->render('pages/file_show', $this->controller_page_layout);
     }
