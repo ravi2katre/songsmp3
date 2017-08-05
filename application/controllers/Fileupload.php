@@ -1,5 +1,6 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
+
 class Fileupload extends MY_Controller
 {
     public function __construct()
@@ -17,7 +18,7 @@ class Fileupload extends MY_Controller
         $options['upload_url'] = base_url('uploads/files/');
 
 
-        $title = $this->input->post_get('title');
+        $this->input->post_get('title');
 
         $options['print_response'] = true;
 
@@ -25,7 +26,7 @@ class Fileupload extends MY_Controller
             $options['upload_dir'] = FCPATH.($this->session->userdata['cat']['folder']);
 
             $options['upload_url'] = base_url($this->session->userdata['cat']['folder']);
-            $cid = $this->session->userdata['cat']['id'];
+            $this->session->userdata['cat']['id'];
         }
 
         mkdir_if_not_exist($options['upload_dir']);
