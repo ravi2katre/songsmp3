@@ -72,71 +72,17 @@ class JSPacker
     const IGNORE = '$1';
 
     // validate parameters
-    const JSFUNCTION_unpack =
-
-        'function($packed, $ascii, $count, $keywords, $encode, $decode) {
-    while ($count--) {
-        if ($keywords[$count]) {
-            $packed = $packed.replace(new RegExp(\'\\\\b\' + $encode($count) + \'\\\\b\', \'g\'), $keywords[$count]);
-        }
-    }
-    return $packed;
-}';
-    const JSFUNCTION_decodeBody =
-//_decode = function() {
-// does the browser support String.replace where the
-//  replacement value is a function?
-
-        '    if (!\'\'.replace(/^/, String)) {
-        // decode all the values we need
-        while ($count--) {
-            $decode[$encode($count)] = $keywords[$count] || $encode($count);
-        }
-        // global replacement function
-        $keywords = [function ($encoded) {return $decode[$encoded]}];
-        // generic match
-        $encode = function () {return \'\\\\w+\'};
-        // reset the loop counter -  we are now doing a global replace
-        $count = 1;
-    }
-';
-    const JSFUNCTION_encode10 =
-        'function($charCode) {
-    return $charCode;
-}';
-    const JSFUNCTION_encode36 =
-        'function($charCode) {
-    return $charCode.toString(36);
-}';
-    const JSFUNCTION_encode62 =
-        'function($charCode) {
-    return ($charCode < _encoding ? \'\' : arguments.callee(parseInt($charCode / _encoding))) +
-    (($charCode = $charCode % _encoding) > 35 ? String.fromCharCode($charCode + 29) : $charCode.toString(36));
-}';
-    const JSFUNCTION_encode95 =
-        'function($charCode) {
-    return ($charCode < _encoding ? \'\' : arguments.callee($charCode / _encoding)) +
-        String.fromCharCode($charCode % _encoding + 161);
-}';
     private $_script = '';
     private $_encoding = 62;
     private $_fastDecode = true;
-
-    // apply all parsing routines
     private $_specialChars = false;
 
-    // keep a list of parsing functions, they'll be executed all at once
     private $LITERAL_ENCODING = array(
         'None' => 0,
         'Numeric' => 10,
         'Normal' => 62,
         'High ASCII' => 95
     );
-    private $_parsers = array();
-
-    // zero encoding - just removal of white space and comments
-    private $_count = array();
-    private $buffer;
 
     public function __construct($_script, $_encoding = 62, $_fastDecode = true, $_specialChars = false)
     {
@@ -158,6 +104,36 @@ class JSPacker
         $this->_encoding = $_encoding;
     }
 
+    public function pack()
+    {
+        $this->_addParser('_basicCompression');
+        if ($this->_specialChars)
+            $this->_addParser('_encodeSpecialChars');
+        if ($this->_encoding)
+            $this->_addParser('_encodeKeywords');
+
+        // go!
+        return $this->_pack($this->_script);
+    }
+
+    // apply all parsing routines
+    private function _pack($script)
+    {
+        for ($i = 0; isset($this->_parsers[$i]); $i++) {
+            $script = call_user_func(array(&$this, $this->_parsers[$i]), $script);
+        }
+        return $script;
+    }
+
+    // keep a list of parsing functions, they'll be executed all at once
+    private $_parsers = array();
+
+    private function _addParser($parser)
+    {
+        $this->_parsers[] = $parser;
+    }
+
+    // zero encoding - just removal of white space and comments
     private function _basicCompression($script)
     {
         $parser = new ParseMaster();
@@ -188,8 +164,6 @@ class JSPacker
         return $parser->exec($script);
     }
 
-    // build the boot function used for loading and decoding
-
     private function _encodeSpecialChars($script)
     {
         $parser = new ParseMaster();
@@ -211,6 +185,36 @@ class JSPacker
             )
         );
         return $parser->exec($script);
+    }
+
+    private function _encodeKeywords($script)
+    {
+        // escape high-ascii values already in the script (i.e. in strings)
+        if ($this->_encoding > 62)
+            $script = $this->_escape95($script);
+        // create the parser
+        $parser = new ParseMaster();
+        $encode = $this->_getEncoder($this->_encoding);
+        // for high-ascii, don't encode single character low-ascii
+        $regexp = ($this->_encoding > 62) ? '/\\w\\w+/' : '/\\w+/';
+        // build the word list
+        $keywords = $this->_analyze($script, $regexp, $encode);
+        $encoded = $keywords['encoded'];
+
+        // encode
+        $parser->add($regexp,
+            array(
+                'fn' => '_replace_encoded',
+                'data' => $encoded
+            )
+        );
+        if (empty($script)) return $script;
+        else {
+            //$res = $parser->exec($script);
+            //$res = $this->_bootStrap($res, $keywords);
+            //return $res;
+            return $this->_bootStrap($parser->exec($script), $keywords);
+        }
     }
 
     private function _analyze($script, $regexp, $encode)
@@ -288,56 +292,14 @@ class JSPacker
             'protected' => $_protected);
     }
 
-    private function _encodeKeywords($script)
-    {
-        // escape high-ascii values already in the script (i.e. in strings)
-        if ($this->_encoding > 62)
-            $script = $this->_escape95($script);
-        // create the parser
-        $parser = new ParseMaster();
-        $encode = $this->_getEncoder($this->_encoding);
-        // for high-ascii, don't encode single character low-ascii
-        $regexp = ($this->_encoding > 62) ? '/\\w\\w+/' : '/\\w+/';
-        // build the word list
-        $keywords = $this->_analyze($script, $regexp, $encode);
-        $encoded = $keywords['encoded'];
+    private $_count = array();
 
-        // encode
-        $parser->add($regexp,
-            array(
-                'fn' => '_replace_encoded',
-                'data' => $encoded
-            )
-        );
-        if (empty($script)) return $script;
-        else {
-            //$res = $parser->exec($script);
-            //$res = $this->_bootStrap($res, $keywords);
-            //return $res;
-            return $this->_bootStrap($parser->exec($script), $keywords);
-        }
+    private function _sortWords($match1, $match2)
+    {
+        return $this->_count[$match2] - $this->_count[$match1];
     }
 
-    private function _escape95($script)
-    {
-        return preg_replace_callback(
-            '/[\\xa1-\\xff]/',
-            array(&$this, '_escape95Bis'),
-            $script
-        );
-    }
-
-    // mmm.. ..which one do i need ??
-
-    private function _getEncoder($ascii)
-    {
-        return $ascii > 10 ? $ascii > 36 ? $ascii > 62 ?
-            '_encode95' : '_encode62' : '_encode36' : '_encode10';
-    }
-
-    // zero encoding
-    // characters: 0123456789
-
+    // build the boot function used for loading and decoding
     private function _bootStrap($packed, $keywords)
     {
         $ENCODE = $this->_safeRegExp('$encode\\($count\\)');
@@ -417,66 +379,7 @@ class JSPacker
         return 'eval(' . $unpack . '(' . $params . "))\n";
     }
 
-    // inherent base36 support
-    // characters: 0123456789abcdefghijklmnopqrstuvwxyz
-
-    private function _safeRegExp($string)
-    {
-        return '/' . preg_replace('/\$/', '\\\$', $string) . '/';
-    }
-
-    // hitch a ride on base36 and add the upper case alpha characters
-    // characters: 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
-
-    private function _escape($script)
-    {
-        return preg_replace('/([\\\\\'])/', '\\\$1', $script);
-    }
-
-    // use high-ascii values
-    // characters: ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþ
-
-    private function _getJSFunction($aName)
-    {
-        if (defined('self::JSFUNCTION' . $aName))
-            return constant('self::JSFUNCTION' . $aName);
-        else
-            return '';
-    }
-
-    public function pack()
-    {
-        $this->_addParser('_basicCompression');
-        if ($this->_specialChars)
-            $this->_addParser('_encodeSpecialChars');
-        if ($this->_encoding)
-            $this->_addParser('_encodeKeywords');
-
-        // go!
-        return $this->_pack($this->_script);
-    }
-
-    private function _addParser($parser)
-    {
-        $this->_parsers[] = $parser;
-    }
-
-    // protect characters used by the parser
-
-    private function _pack($script)
-    {
-        for ($i = 0; isset($this->_parsers[$i]); $i++) {
-            $script = call_user_func(array(&$this, $this->_parsers[$i]), $script);
-        }
-        return $script;
-    }
-
-    // protect high-ascii characters already in the script
-
-    private function _sortWords($match1, $match2)
-    {
-        return $this->_count[$match2] - $this->_count[$match1];
-    }
+    private $buffer;
 
     private function _insertFastDecode($match)
     {
@@ -486,6 +389,94 @@ class JSPacker
     private function _insertFastEncode($match)
     {
         return '{$encode=' . $this->buffer . ';';
+    }
+
+    // mmm.. ..which one do i need ??
+    private function _getEncoder($ascii)
+    {
+        return $ascii > 10 ? $ascii > 36 ? $ascii > 62 ?
+            '_encode95' : '_encode62' : '_encode36' : '_encode10';
+    }
+
+    // zero encoding
+    // characters: 0123456789
+    private function _encode10($charCode)
+    {
+        return $charCode;
+    }
+
+    // inherent base36 support
+    // characters: 0123456789abcdefghijklmnopqrstuvwxyz
+    private function _encode36($charCode)
+    {
+        return base_convert($charCode, 10, 36);
+    }
+
+    // hitch a ride on base36 and add the upper case alpha characters
+    // characters: 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
+    private function _encode62($charCode)
+    {
+        $res = '';
+        if ($charCode >= $this->_encoding) {
+            $res = $this->_encode62((int)($charCode / $this->_encoding));
+        }
+        $charCode = $charCode % $this->_encoding;
+
+        if ($charCode > 35)
+            return $res . chr($charCode + 29);
+        else
+            return $res . base_convert($charCode, 10, 36);
+    }
+
+    // use high-ascii values
+    // characters: ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþ
+    private function _encode95($charCode)
+    {
+        $res = '';
+        if ($charCode >= $this->_encoding)
+            $res = $this->_encode95($charCode / $this->_encoding);
+
+        return $res . chr(($charCode % $this->_encoding) + 161);
+    }
+
+    private function _safeRegExp($string)
+    {
+        return '/' . preg_replace('/\$/', '\\\$', $string) . '/';
+    }
+
+    private function _encodePrivate($charCode)
+    {
+        return "_" . $charCode;
+    }
+
+    // protect characters used by the parser
+    private function _escape($script)
+    {
+        return preg_replace('/([\\\\\'])/', '\\\$1', $script);
+    }
+
+    // protect high-ascii characters already in the script
+    private function _escape95($script)
+    {
+        return preg_replace_callback(
+            '/[\\xa1-\\xff]/',
+            array(&$this, '_escape95Bis'),
+            $script
+        );
+    }
+
+    private function _escape95Bis($match)
+    {
+        return '\x' . ((string)dechex(ord($match)));
+    }
+
+
+    private function _getJSFunction($aName)
+    {
+        if (defined('self::JSFUNCTION' . $aName))
+            return constant('self::JSFUNCTION' . $aName);
+        else
+            return '';
     }
 
     // JavaScript Functions used.
@@ -500,11 +491,16 @@ class JSPacker
     //  data extracted from this packing routine is passed to
     //  this function when decoded in the target
     // NOTE ! : without the ';' final.
+    const JSFUNCTION_unpack =
 
-    private function _encode10($charCode)
-    {
-        return $charCode;
+        'function($packed, $ascii, $count, $keywords, $encode, $decode) {
+    while ($count--) {
+        if ($keywords[$count]) {
+            $packed = $packed.replace(new RegExp(\'\\\\b\' + $encode($count) + \'\\\\b\', \'g\'), $keywords[$count]);
+        }
     }
+    return $packed;
+}';
     /*
     'function($packed, $ascii, $count, $keywords, $encode, $decode) {
         while ($count--)
@@ -515,11 +511,24 @@ class JSPacker
     */
 
     // code-snippet inserted into the unpacker to speed up decoding
+    const JSFUNCTION_decodeBody =
+//_decode = function() {
+// does the browser support String.replace where the
+//  replacement value is a function?
 
-    private function _encode36($charCode)
-    {
-        return base_convert($charCode, 10, 36);
+        '    if (!\'\'.replace(/^/, String)) {
+        // decode all the values we need
+        while ($count--) {
+            $decode[$encode($count)] = $keywords[$count] || $encode($count);
+        }
+        // global replacement function
+        $keywords = [function ($encoded) {return $decode[$encoded]}];
+        // generic match
+        $encode = function () {return \'\\\\w+\'};
+        // reset the loop counter -  we are now doing a global replace
+        $count = 1;
     }
+';
 //};
     /*
     '	if (!\'\'.replace(/^/, String)) {
@@ -536,61 +545,46 @@ class JSPacker
 
     // zero encoding
     // characters: 0123456789
-
-    private function _encode62($charCode)
-    {
-        $res = '';
-        if ($charCode >= $this->_encoding) {
-            $res = $this->_encode62((int)($charCode / $this->_encoding));
-        }
-        $charCode = $charCode % $this->_encoding;
-
-        if ($charCode > 35)
-            return $res . chr($charCode + 29);
-        else
-            return $res . base_convert($charCode, 10, 36);
-    }//;';
+    const JSFUNCTION_encode10 =
+        'function($charCode) {
+    return $charCode;
+}';//;';
 
     // inherent base36 support
     // characters: 0123456789abcdefghijklmnopqrstuvwxyz
-
-    private function _encode95($charCode)
-    {
-        $res = '';
-        if ($charCode >= $this->_encoding)
-            $res = $this->_encode95($charCode / $this->_encoding);
-
-        return $res . chr(($charCode % $this->_encoding) + 161);
-    }//;';
+    const JSFUNCTION_encode36 =
+        'function($charCode) {
+    return $charCode.toString(36);
+}';//;';
 
     // hitch a ride on base36 and add the upper case alpha characters
     // characters: 0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ
-
-    private function _encodePrivate($charCode)
-    {
-        return "_" . $charCode;
-    }
+    const JSFUNCTION_encode62 =
+        'function($charCode) {
+    return ($charCode < _encoding ? \'\' : arguments.callee(parseInt($charCode / _encoding))) +
+    (($charCode = $charCode % _encoding) > 35 ? String.fromCharCode($charCode + 29) : $charCode.toString(36));
+}';
 
     // use high-ascii values
     // characters: ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½¾¿ÀÁÂÃÄÅÆÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖ×ØÙÚÛÜÝÞßàáâãäåæçèéêëìíîïðñòóôõö÷øùúûüýþ
-
-    private function _escape95Bis($match)
-    {
-        return '\x' . ((string)dechex(ord($match)));
-    }
+    const JSFUNCTION_encode95 =
+        'function($charCode) {
+    return ($charCode < _encoding ? \'\' : arguments.callee($charCode / _encoding)) +
+        String.fromCharCode($charCode % _encoding + 161);
+}';
 
 }
 
 
 class ParseMaster
 {
-    const EXPRESSION = 0;
-    const REPLACEMENT = 1;
-
-    // constants
-    const LENGTH = 2;
     public $ignoreCase = false;
     public $escapeChar = '';
+
+    // constants
+    const EXPRESSION = 0;
+    const REPLACEMENT = 1;
+    const LENGTH = 2;
 
     // used to determine nesting levels
     private $GROUPS = '/\\(/';//g
@@ -600,11 +594,6 @@ class ParseMaster
     private $ESCAPE = '/\\\./';//g
     private $QUOTE = '/\'/';
     private $DELETED = '/\\x01[^\\x01]*\\x01/';//g
-    private
-    private $_escaped = array();
-
-pub    pub/
-    private $_patterns = array();  // escaped characters
 
     public function add($expression, $replacement = '')
     {
@@ -638,28 +627,9 @@ pub    pub/
         // pass the modified arguments
         if (!empty($expression)) $this->_add($expression, $replacement, $length);
         else $this->_add('/^$/', $replacement, $length);
-    } // patterns stored by index
-
-    // create and add a new pattern to the patterns collection
-pri
-vate
-    function _internalEscape($string)
-    {
-        return preg_replace($this->ESCAPE, '', $string);
     }
 
-    // this is the global replace function (it's quite complicated)
-pri
-lic
-    function _add()
-    {
-        $arguments = func_get_args();
-        $this->_patterns[] = $arguments;
-    }
-
-pri
-vate
-    function exec($string)
+    public function exec($string)
     {
         // execute the global replacement
         $this->_escaped = array();
@@ -685,58 +655,26 @@ vate
 
         return preg_replace($this->DELETED, '', $string);
     }
-prpri
-vate
-    function _escape($string, $escapeChar)
-    {
-        if ($escapeChar) {
-            $this->buffer = $escapeChar;
-            return preg_replace_callback(
-                '/\\' . $escapeChar . '(.)' . '/',
-                array(&$this, '_escapeBis'),
-                $string
-            );
 
-        } else {
-            return $string;
-        }
-    }
-prpri
-lic
-    function _unescape($string, $escapeChar)
-    {
-        if ($escapeChar) {
-            $regexp = '/' . '\\' . $escapeChar . '/';
-            $this->buffer = array('escapeChar' => $escapeChar, 'i' => 0);
-            return preg_replace_callback
-            (
-                $regexp,
-                array(&$this, '_unescapeBis'),
-                $string
-            );
-
-        } else {
-            return $string;
-        }
-    }
-
-/
-    // php : we cannot pass additional data to preg_replace_callback,
-    // and we cannot use &$this in create_function, so let's go to lower level
-pri
-vate
-    function reset()
+    public function reset()
     {
         // clear the patterns collection so that this object may be re-used
         $this->_patterns = array();
     }
 
-vate $buffer;
+    // private
+    private $_escaped = array();  // escaped characters
+    private $_patterns = array(); // patterns stored by index
 
-    // encode escaped characters
-pri
-vate
-    function _replacement($arguments)
+    // create and add a new pattern to the patterns collection
+    private function _add()
+    {
+        $arguments = func_get_args();
+        $this->_patterns[] = $arguments;
+    }
+
+    // this is the global replace function (it's quite complicated)
+    private function _replacement($arguments)
     {
         if (empty($arguments)) return '';
 
@@ -770,9 +708,7 @@ vate
         }
     }
 
-i
-vate
-    function _backReferences($match, $offset)
+    private function _backReferences($match, $offset)
     {
         $replacement = $this->buffer['replacement'];
         $quote = $this->buffer['quote'];
@@ -783,33 +719,64 @@ vate
         return $replacement;
     }
 
-    // decode escaped characters
-pri
-vate
-    function _replace_name($match, $offset)
+    private function _replace_name($match, $offset)
     {
         $length = strlen($match[$offset + 2]);
         $start = $length - max($length - strlen($match[$offset + 3]), 0);
         return substr($match[$offset + 1], $start, $length) . $match[$offset + 4];
     }
 
-i
-vate
-    function _replace_encoded($match, $offset)
+    private function _replace_encoded($match, $offset)
     {
         return $this->buffer[$match[$offset]];
     }
 
-pri
-vate
-    function _escapeBis($match)
+
+    // php : we cannot pass additional data to preg_replace_callback,
+    // and we cannot use &$this in create_function, so let's go to lower level
+    private $buffer;
+
+    // encode escaped characters
+    private function _escape($string, $escapeChar)
+    {
+        if ($escapeChar) {
+            $this->buffer = $escapeChar;
+            return preg_replace_callback(
+                '/\\' . $escapeChar . '(.)' . '/',
+                array(&$this, '_escapeBis'),
+                $string
+            );
+
+        } else {
+            return $string;
+        }
+    }
+
+    private function _escapeBis($match)
     {
         $this->_escaped[] = $match[1];
         return $this->buffer;
     }
 
-vate
-    function _unescapeBis()
+    // decode escaped characters
+    private function _unescape($string, $escapeChar)
+    {
+        if ($escapeChar) {
+            $regexp = '/' . '\\' . $escapeChar . '/';
+            $this->buffer = array('escapeChar' => $escapeChar, 'i' => 0);
+            return preg_replace_callback
+            (
+                $regexp,
+                array(&$this, '_unescapeBis'),
+                $string
+            );
+
+        } else {
+            return $string;
+        }
+    }
+
+    private function _unescapeBis()
     {
         if (isset($this->_escaped[$this->buffer['i']])
             && $this->_escaped[$this->buffer['i']] != '') {
@@ -819,5 +786,10 @@ vate
         }
         $this->buffer['i']++;
         return $this->buffer['escapeChar'] . $temp;
+    }
+
+    private function _internalEscape($string)
+    {
+        return preg_replace($this->ESCAPE, '', $string);
     }
 }
